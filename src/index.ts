@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import { Octokit } from 'octokit';
+// import { Octokit } from 'octokit';
 import { initializeGitHubApp, getInstallationOctokit } from './github-app';
 import { verifyWebhookSignature } from './webhook-verification';
 

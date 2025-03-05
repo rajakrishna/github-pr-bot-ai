@@ -1,21 +1,19 @@
-FROM node:18-slim
+FROM node:23.9.0-slim
 
 WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+RUN npm install -g typescript
 
-# Copy source code
+RUN npm install
+
 COPY . .
 
-# Build TypeScript code
+RUN tsc
+
 RUN npm run build
 
-# Expose the port the app runs on
 EXPOSE 8080
 
-# Command to run the application
 CMD ["npm", "start"] 

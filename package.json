@@ -4,10 +4,13 @@
   "description": "A GitHub bot that comments 'hello' on every PR",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "node_modules/.bin/tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn src/index.ts",
-    "postinstall": "npm run build"
+    "docker:build": "docker build -t github-pr-bot .",
+    "docker:run": "docker run -p 3000:8080 --env-file .env github-pr-bot",
+    "docker:local": "npm run docker:build && npm run docker:run",
+    "docker:debug": "docker run -it --entrypoint /bin/bash -p 3000:8080 --env-file .env github-pr-bot"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
@@ -23,7 +26,7 @@
     "typescript": "^5.8.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "author": "",
   "license": "MIT"
