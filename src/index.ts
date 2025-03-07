@@ -1,28 +1,19 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
-// import { Octokit } from 'octokit';
 import { initializeGitHubApp, getInstallationOctokit } from './github-app.js';
-import { verifyWebhookSignature } from './webhook-verification.js';
 
-// Load environment variables
 dotenv.config();
-
-// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Parse JSON request body
 app.use(express.json({
   verify: (req, res, buf) => {
-    // Store raw body for webhook signature verification
     (req as any).rawBody = buf;
   }
 }));
 
-// Initialize GitHub App
 const githubApp = initializeGitHubApp();
 
-// Set up webhook handlers
 githubApp.webhooks.on('pull_request.opened', async ({ octokit, payload }) => {
   try {
     const repo = payload.repository.name;
@@ -77,12 +68,10 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log('GitHub PR Bot is ready to receive events');

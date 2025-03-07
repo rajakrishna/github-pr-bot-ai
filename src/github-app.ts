@@ -2,10 +2,8 @@ import { Octokit, App } from 'octokit';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Initialize GitHub App
 export const initializeGitHubApp = () => {
   try {
-    // Get private key from environment or file
     let privateKey: string;
     
     if (process.env.GITHUB_PRIVATE_KEY) {
@@ -21,7 +19,7 @@ export const initializeGitHubApp = () => {
       throw new Error('GitHub App private key not found');
     }
     console.log('initializeGitHubApp');
-    // Create GitHub App instance with Octokit
+
     const octokit = new App({
       appId: process.env.GITHUB_APP_ID!,
       privateKey: privateKey,
@@ -44,20 +42,17 @@ export const initializeGitHubApp = () => {
   }
 };
 
-// Get an installation access token for a repository
 export const getInstallationOctokit = async (
   appOctokit: App,
   owner: string,
   repo: string
 ) => {
   try {
-    // Get the installation for the repository using App methods
     const installation = await appOctokit.octokit.request('GET /repos/{owner}/{repo}/installation', {
       owner,
       repo,
     });
 
-    // Get an authenticated octokit instance for this installation
     const installationOctokit = await appOctokit.getInstallationOctokit(installation.data.id);
     
     return installationOctokit;
