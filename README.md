@@ -1,10 +1,15 @@
 # GitHub PR Bot
 
-A simple GitHub bot that comments "hello" on every new pull request. This bot is built with TypeScript, Express, and the Octokit SDK for GitHub API integration.
+A GitHub bot that provides AI-powered code reviews on every new pull request. This bot is built with TypeScript, Express, the Octokit SDK for GitHub API integration, and the Vercel AI SDK with Google AI.
 
 ## Features
 
-- Automatically comments "Hello! 👋" on new pull requests
+- Automatically analyzes code changes in new pull requests
+- Provides intelligent, context-aware comments that:
+  - Summarize the changes
+  - Highlight good practices
+  - Suggest improvements
+  - Ask relevant questions
 - Built as a GitHub App for easy installation in multiple repositories
 - Deployable to Google Cloud Run
 
@@ -13,6 +18,7 @@ A simple GitHub bot that comments "hello" on every new pull request. This bot is
 - Node.js 18 or higher
 - A GitHub account
 - Google Cloud Platform account (for deployment)
+- Google AI API key
 
 ## Setup
 
@@ -67,7 +73,7 @@ A simple GitHub bot that comments "hello" on every new pull request. This bot is
 5. Set environment variables in Google Cloud Run:
    - Go to the Cloud Run service
    - Click "Edit & Deploy New Revision"
-   - Add all the environment variables from your `.env` file
+   - Add all the environment variables from your `.env` file, including your `GOOGLE_AI_API_KEY`
    - Deploy the new revision
 
 ### 4. Configure Webhook
@@ -81,7 +87,7 @@ A simple GitHub bot that comments "hello" on every new pull request. This bot is
 1. Go to your GitHub App's page
 2. Click "Install App" in the sidebar
 3. Choose the repositories where you want to install the bot
-4. The bot will now comment "Hello! 👋" on all new pull requests in those repositories
+4. The bot will now provide AI-powered code reviews on all new pull requests in those repositories
 
 ## Development
 
@@ -91,4 +97,4 @@ A simple GitHub bot that comments "hello" on every new pull request. This bot is
 
 ## License
 
-MIT 
+MIT

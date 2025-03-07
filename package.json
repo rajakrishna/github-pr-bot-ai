@@ -1,7 +1,7 @@
 {
   "name": "github-pr-bot-ai",
   "version": "1.0.0",
-  "description": "A GitHub bot that comments 'hello' on every PR",
+  "description": "A GitHub bot that provides AI-powered code reviews on PRs",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
@@ -9,12 +9,17 @@
     "local:build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn src/index.ts",
+    "test:ai": "npm run build && node scripts/test-ai-analyzer.js",
     "docker:build": "docker build -t github-pr-bot .",
     "docker:run": "docker run -p 3000:8080 --env-file .env github-pr-bot",
     "docker:local": "npm run docker:build && npm run docker:run",
-    "docker:debug": "docker run -it --entrypoint /bin/bash -p 3000:8080 --env-file .env github-pr-bot"
+    "docker:debug": "docker run -it --entrypoint /bin/bash -p 3000:8080 --env-file .env github-pr-bot",
+    "format": "prettier --write .",
+    "check-format": "prettier --check ."
   },
   "dependencies": {
+    "@ai-sdk/google": "^1.1.20",
+    "ai": "^4.1.54",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "octokit": "^4.1.2"
@@ -23,6 +28,7 @@
     "@types/express": "^4.17.21",
     "@types/node": "^20.10.0",
     "nodemon": "^3.0.1",
+    "prettier": "^3.5.3",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.2"
@@ -32,5 +38,4 @@
   },
   "author": "",
   "license": "MIT"
-  
 }

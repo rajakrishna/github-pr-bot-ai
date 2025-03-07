@@ -1,13 +1,12 @@
 steps:
-
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'us-south1-docker.pkg.dev/$PROJECT_ID/github-pr-bot/github-pr-bot:latest', '.']
-  
+
   # Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-south1-docker.pkg.dev/$PROJECT_ID/github-pr-bot/github-pr-bot:latest']
-  
+
   # Set IAM policy for Cloud Run (Ensure Cloud Build SA can deploy)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
@@ -17,7 +16,7 @@ steps:
       - '$PROJECT_ID'
       - '--member=serviceAccount:$PROJECT_NUMBER@cloudbuild.gserviceaccount.com'
       - '--role=roles/run.admin'
-  
+
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
@@ -36,4 +35,4 @@ steps:
 images:
   - 'us-south1-docker.pkg.dev/$PROJECT_ID/github-pr-bot/github-pr-bot:latest'
 
-timeout: 1800s 
+timeout: 1800s
