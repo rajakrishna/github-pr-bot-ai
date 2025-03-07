@@ -1,8 +1,8 @@
 import express from 'express';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 // import { Octokit } from 'octokit';
-import { initializeGitHubApp, getInstallationOctokit } from './github-app';
-import { verifyWebhookSignature } from './webhook-verification';
+import { initializeGitHubApp, getInstallationOctokit } from './github-app.js';
+import { verifyWebhookSignature } from './webhook-verification.js';
 
 // Load environment variables
 dotenv.config();
@@ -22,37 +22,14 @@ app.use(express.json({
 // Initialize GitHub App
 const githubApp = initializeGitHubApp();
 
-// Webhook endpoint for GitHub events
-app.post('/webhook', verifyWebhookSignature, async (req, res) => {
-  const event = req.headers['x-github-event'] as string;
-  const payload = req.body;
-
-  console.log(`Received ${event} event`);
-
+// Set up webhook handlers
+githubApp.webhooks.on('pull_request.opened', async ({ octokit, payload }) => {
   try {
-    // Handle pull request events
-    if (event === 'pull_request' && payload.action === 'opened') {
-      await handlePullRequestOpened(payload);
-    }
+    const repo = payload.repository.name;
+    const owner = payload.repository.owner.login;
+    const prNumber = payload.pull_request.number;
 
-    res.status(200).send('Event received');
-  } catch (error) {
-    console.error('Error processing webhook:', error);
-    res.status(500).send('Error processing webhook');
-  }
-});
-
-// Function to handle new pull requests
-async function handlePullRequestOpened(payload: any): Promise<void> {
-  const repo = payload.repository.name;
-  const owner = payload.repository.owner.login;
-  const prNumber = payload.pull_request.number;
-
-  console.log(`New PR #${prNumber} opened in ${owner}/${repo}`);
-
-  try {
-    // Get an authenticated Octokit instance for this repository
-    const octokit = await getInstallationOctokit(githubApp, owner, repo);
+    console.log(`New PR #${prNumber} opened in ${owner}/${repo}`);
 
     // Create a comment on the pull request
     await octokit.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
@@ -65,9 +42,40 @@ async function handlePullRequestOpened(payload: any): Promise<void> {
     console.log(`Commented on PR #${prNumber}`);
   } catch (error) {
     console.error('Error commenting on PR:', error);
-    throw error;
   }
-}
+});
+
+// Webhook endpoint for GitHub events
+app.post('/webhook', async (req, res) => {
+  const id = req.headers['x-github-delivery'] as string;
+  const name = req.headers['x-github-event'] as string;
+  const signature = req.headers['x-hub-signature-256'] as string;
+  
+  if (!id || !name) {
+    return res.status(400).send('Missing required GitHub webhook headers');
+  } 
+  console.log('webhook headers',JSON.stringify({headers:req.headers}));
+  try {
+    // Use the App's webhook handler
+    console.log('webhook input data',JSON.stringify({
+      id,
+      name,
+      payload: req.body,
+      signature
+    }));
+    await githubApp.webhooks.verifyAndReceive({
+      id,
+      name,
+      payload: JSON.stringify(req.body),
+      signature
+    });
+    
+    res.status(200).send('Event received');
+  } catch (error) {
+    console.error('Error processing webhook:', error);
+    res.status(500).send('Error processing webhook');
+  }
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {

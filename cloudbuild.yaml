@@ -2,11 +2,11 @@ steps:
 
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/github-pr-bot:latest', '.']
+    args: ['build', '-t', 'us-south1-docker.pkg.dev/$PROJECT_ID/github-pr-bot/github-pr-bot:latest', '.']
   
-  # Push the container image to Container Registry
+  # Push the container image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/github-pr-bot:latest']
+    args: ['push', 'us-south1-docker.pkg.dev/$PROJECT_ID/github-pr-bot/github-pr-bot:latest']
   
   # Set IAM policy for Cloud Run (Ensure Cloud Build SA can deploy)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -26,7 +26,7 @@ steps:
       - 'deploy'
       - 'github-pr-bot'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/github-pr-bot:$COMMIT_SHA'
+      - 'us-south1-docker.pkg.dev/$PROJECT_ID/github-pr-bot/github-pr-bot:latest'
       - '--region'
       - 'us-central1'
       - '--platform'
@@ -34,6 +34,6 @@ steps:
       - '--allow-unauthenticated'
 
 images:
-  - 'gcr.io/$PROJECT_ID/github-pr-bot:$COMMIT_SHA'
+  - 'us-south1-docker.pkg.dev/$PROJECT_ID/github-pr-bot/github-pr-bot:latest'
 
 timeout: 1800s 

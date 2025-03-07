@@ -1,6 +1,6 @@
-import { Octokit } from 'octokit';
-import fs from 'fs';
-import path from 'path';
+import { Octokit, App } from 'octokit';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Initialize GitHub App
 export const initializeGitHubApp = () => {
@@ -20,15 +20,20 @@ export const initializeGitHubApp = () => {
     } else {
       throw new Error('GitHub App private key not found');
     }
-
+    console.log('initializeGitHubApp');
     // Create GitHub App instance with Octokit
-    const octokit = new Octokit({
-      auth: {
-        appId: process.env.GITHUB_APP_ID!,
-        privateKey: privateKey,
-        clientId: process.env.GITHUB_CLIENT_ID,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      }
+    const octokit = new App({
+      appId: process.env.GITHUB_APP_ID!,
+      privateKey: privateKey,
+      webhooks: {
+        secret: process.env.GITHUB_WEBHOOK_SECRET || 'secret'
+      },
+      Octokit: Octokit.defaults({
+        auth: {
+          appId: process.env.GITHUB_APP_ID!,
+          privateKey: privateKey
+        }
+      })
     });
 
     console.log('GitHub App initialized successfully');
@@ -41,26 +46,20 @@ export const initializeGitHubApp = () => {
 
 // Get an installation access token for a repository
 export const getInstallationOctokit = async (
-  appOctokit: Octokit,
+  appOctokit: App,
   owner: string,
   repo: string
 ) => {
   try {
-    // Get the installation ID for the repository
-    const { data: installation } = await appOctokit.request('GET /repos/{owner}/{repo}/installation', {
+    // Get the installation for the repository using App methods
+    const installation = await appOctokit.octokit.request('GET /repos/{owner}/{repo}/installation', {
       owner,
       repo,
     });
 
-    // Create a new Octokit instance with the installation token
-    const installationOctokit = new Octokit({
-      auth: {
-        appId: process.env.GITHUB_APP_ID!,
-        privateKey: process.env.GITHUB_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-        installationId: installation.id
-      }
-    });
-
+    // Get an authenticated octokit instance for this installation
+    const installationOctokit = await appOctokit.getInstallationOctokit(installation.data.id);
+    
     return installationOctokit;
   } catch (error) {
     console.error(`Error getting installation for ${owner}/${repo}:`, error);

@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "A GitHub bot that comments 'hello' on every PR",
   "main": "dist/index.js",
+  "type": "module",
   "scripts": {
     "build": "node_modules/.bin/tsc",
+    "local:build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn src/index.ts",
     "docker:build": "docker build -t github-pr-bot .",
@@ -30,4 +32,5 @@
   },
   "author": "",
   "license": "MIT"
+  
 }
