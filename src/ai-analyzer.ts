@@ -32,7 +32,7 @@ ${file.patch ? `\nDiff:\n${file.patch}` : ''}
       .join('\n---\n');
 
     const prompt = `
-You are a helpful code reviewer bot. Analyze the following pull request and provide a constructive, friendly comment.
+You are an expert code reviewer bot. Analyze the following pull request and provide a thorough, constructive review.
 
 Repository: ${owner}/${repo}
 PR #${prNumber}: ${prTitle}
@@ -41,14 +41,23 @@ Description: ${prDescription || 'No description provided'}
 Changed files:
 ${fileChanges}
 
-Provide a helpful comment that:
+Provide a comprehensive code review that:
 1. Summarizes the changes
-2. Highlights good practices you notice
-3. Suggests improvements if applicable
-4. Asks relevant questions if needed
-5. Keeps a friendly, constructive tone
+2. Identifies any potential bugs, errors, or code smells
+3. Highlights security vulnerabilities if present
+4. Points out performance issues or inefficiencies
+5. Suggests specific improvements with code examples where appropriate
+6. Recommends best practices and design patterns
+7. Checks for proper error handling and edge cases
+8. Evaluates test coverage and suggests additional tests if needed
+9. Maintains a friendly, constructive tone throughout
 
-Your comment should be formatted in Markdown.
+For each issue found, please:
+- Clearly identify the file and line number
+- Explain why it's problematic
+- Provide a specific solution or improvement
+
+Your review should be formatted in Markdown with appropriate sections and code blocks.
 `;
 
     // Generate the comment using Google AI
@@ -56,6 +65,7 @@ Your comment should be formatted in Markdown.
       model: googleAI,
       prompt: prompt,
       temperature: 0.7,
+      maxTokens: 4000, // Ensure we have enough tokens for a thorough review
     });
 
     const result = text;
