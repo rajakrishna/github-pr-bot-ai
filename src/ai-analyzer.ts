@@ -23,37 +23,37 @@ export async function generatePRComment(
     const fileChanges = files
       .map(file => {
         return `
-File: ${file.filename}
-Status: ${file.status}
-Changes: +${file.additions} -${file.deletions}
-${file.patch ? `\nDiff:\n${file.patch}` : ''}
+          File: ${file.filename}
+          Status: ${file.status}
+          Changes: +${file.additions} -${file.deletions}
+          ${file.patch ? `\nDiff:\n${file.patch}` : ''}
       `;
       })
       .join('\n---\n');
 
     const prompt = `
-You are an expert code reviewer bot. Analyze the following pull request focusing only on errors and performance issues.
+      You are an expert code reviewer bot. Analyze the following pull request focusing only on errors and performance issues.
 
-Repository: ${owner}/${repo}
-PR #${prNumber}: ${prTitle}
-Description: ${prDescription || 'No description provided'}
+      Repository: ${owner}/${repo}
+      PR #${prNumber}: ${prTitle}
+      Description: ${prDescription || 'No description provided'}
 
-Changed files:
-${fileChanges}
+      Changed files:
+      ${fileChanges}
 
-Provide a focused code review that only:
-1. Identifies bugs 
-2. Highlights performance issues
+      Provide a focused code review that only:
+      1. Identifies bugs 
+      2. Highlights performance issues
 
-For each issue:
-- Specify file and line number
-- Explain the problem in one sentence
-- Provide a solution in a code block
+      For each issue:
+      - Specify file and line number
+      - Explain the problem in one sentence
+      - Provide a solution in a code block
 
-Format in Markdown with code blocks. 
-Include \`/apply-suggestions\` at the end  if there are any issues found and need to be applied. 
-If there are no issues found, do not include it.
-`;
+      Format in Markdown with code blocks. 
+      Include \`/apply-suggestions\` at the end  if there are any issues found and need to be applied. 
+      If there are no issues found, do not include it.
+      `;
 
     // Generate the comment using Google AI
     const { text } = await generateText({
@@ -71,12 +71,6 @@ If there are no issues found, do not include it.
   }
 }
 
-/**
- * Uses AI to process suggestions from a comment and generate file changes
- * @param commentBody The PR comment body to process
- * @param originalFiles Map of original file contents
- * @returns An array of suggested changes
- */
 export async function processAISuggestions(
   commentBody: string,
   originalFiles: Map<string, string>
@@ -130,25 +124,25 @@ export async function processAISuggestions(
 
     // Create a prompt for Google AI to apply the suggestions to all files at once
     const prompt = `
-You are an expert code assistant. I have files that need changes based on a code review.
+      You are an expert code assistant. I have files that need changes based on a code review.
 
-Original files:
-${filesContent}
+      Original files:
+      ${filesContent}
 
-Code review comments:
-\`\`\`
-${commentBody}
-\`\`\`
+      Code review comments:
+      \`\`\`
+      ${commentBody}
+      \`\`\`
 
-Please apply the suggested changes to the files. For each file that needs changes, return:
+      Please apply the suggested changes to the files. For each file that needs changes, return:
 
-FILE: [filename]
-\`\`\`
-[complete updated file content with all changes applied]
-\`\`\`
+      FILE: [filename]
+      \`\`\`
+      [complete updated file content with all changes applied]
+      \`\`\`
 
-Only include files that need changes. Do not include any explanations between files, just the FILE: marker and code blocks.
-`;
+      Only include files that need changes. Do not include any explanations between files, just the FILE: marker and code blocks.
+      `;
 
     console.log('Sending prompt to Google AI');
 
@@ -157,7 +151,7 @@ Only include files that need changes. Do not include any explanations between fi
       model: googleAI,
       prompt: prompt,
       temperature: 0.2, // Lower temperature for more deterministic results
-      maxTokens: 8000, // Increased token limit to handle multiple files
+      maxTokens: 8000,
     });
 
     if (!text) {
@@ -204,15 +198,6 @@ Only include files that need changes. Do not include any explanations between fi
   }
 }
 
-/**
- * Creates a PR with suggested changes from a comment
- * @param octokit The Octokit instance
- * @param owner Repository owner
- * @param repo Repository name
- * @param prNumber Original PR number
- * @param commentBody Comment body with suggestions
- * @returns The created PR data
- */
 export async function createPRFromSuggestions(
   octokit: any,
   owner: string,
@@ -296,10 +281,12 @@ export async function createPRFromSuggestions(
     const prTitle = `AI-Suggested Changes for PR #${prNumber}`;
     const prBody = `This PR contains AI-generated changes based on the review of PR #${prNumber}.
 
-## Changes included:
-${suggestions.map(s => `- **${s.file}**: ${s.description}`).join('\n')}
+      ## Changes included:
+      ${suggestions.map(s => `- **${s.file}**: ${s.description}`).join('\n')}
 
-Original PR: #${prNumber}`;
+      Original PR: #${prNumber}
+      
+      `;
 
     // Create the PR with suggested changes
     const { createPullRequestFromSuggestions } = await import('./github-app.js');
