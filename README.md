@@ -6,10 +6,9 @@ A GitHub bot that provides AI-powered code reviews on every new pull request. Th
 
 - Automatically analyzes code changes in new pull requests
 - Provides intelligent, context-aware comments that:
-  - Summarize the changes
-  - Highlight good practices
-  - Suggest improvements
-  - Ask relevant questions
+  - Identifies bugs and logical errors
+  - Highlights performance issues and inefficiencies
+- Uses AI to holistically implement suggested changes across multiple files
 - Built as a GitHub App for easy installation in multiple repositories
 - Deployable to Google Cloud Run
 
@@ -34,12 +33,15 @@ A GitHub bot that provides AI-powered code reviews on every new pull request. Th
    - Permissions:
      - Pull requests: Read & Write
      - Metadata: Read-only
-     - Repository contents: Read-only (needed for installation)
+     - Repository contents: Read & Write (needed for creating branches and PRs)
+     - Issues: Read & Write (needed for commenting)
    - Subscribe to events:
      - Pull request
+     - Issue comment
 4. Create the app
 5. Generate a private key and download it
 6. Note your GitHub App ID, Client ID, and Client Secret
+7. Note the username of your GitHub App (visible in the app settings)
 
 ### 2. Local Development
 
@@ -48,7 +50,7 @@ A GitHub bot that provides AI-powered code reviews on every new pull request. Th
    ```bash
    npm install
    ```
-3. Create a `.env` file based on `.env.example` and fill in your GitHub App details
+3. Create a `.env` file based on `.env.example` and fill in your GitHub App details, including the `GITHUB_BOT_USERNAME`
 4. Start the development server:
    ```bash
    npm run dev
@@ -88,6 +90,28 @@ A GitHub bot that provides AI-powered code reviews on every new pull request. Th
 2. Click "Install App" in the sidebar
 3. Choose the repositories where you want to install the bot
 4. The bot will now provide AI-powered code reviews on all new pull requests in those repositories
+
+## Using the Bot
+
+### AI Code Reviews
+
+The bot automatically analyzes new pull requests and provides detailed code reviews as comments, focusing on errors and performance issues.
+
+### Creating PRs from Suggestions
+
+When the AI review suggests code changes, you can have the bot automatically implement them:
+
+1. After receiving an AI review comment
+2. Comment on the PR with `/apply-suggestions` or `/create-pr-from-suggestions`
+3. The bot will:
+   - Send the entire review and all relevant files to Google AI
+   - AI analyzes the review holistically and generates updated file contents
+   - Create a new branch based on your PR branch
+   - Apply all suggested changes across multiple files
+   - Create a new PR targeting your original PR branch
+   - Comment with a link to the new PR
+
+This AI-powered approach provides a comprehensive implementation of suggestions with contextual understanding across your entire codebase.
 
 ## Development
 

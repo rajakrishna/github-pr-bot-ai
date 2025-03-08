@@ -54,3 +54,109 @@ export const getInstallationOctokit = async (appOctokit: App, owner: string, rep
     throw error;
   }
 };
+
+export const createPullRequestFromSuggestions = async (
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  baseBranch: string,
+  headBranch: string,
+  title: string,
+  body: string,
+  changes: Array<{
+    file: string;
+    content: string;
+  }>
+) => {
+  try {
+    // Get the latest commit SHA from the base branch to create our new branch from
+    const { data: baseRef } = await octokit.request('GET /repos/{owner}/{repo}/git/ref/heads/{branch}', {
+      owner,
+      repo,
+      branch: baseBranch,
+    });
+
+    const baseSha = baseRef.object.sha;
+
+    // Check if branch already exists, if not create it
+    try {
+      await octokit.request('GET /repos/{owner}/{repo}/git/ref/heads/{branch}', {
+        owner,
+        repo,
+        branch: headBranch,
+      });
+      console.log(`Branch ${headBranch} already exists`);
+    } catch (error) {
+      // Branch doesn't exist, create it
+      await octokit.request('POST /repos/{owner}/{repo}/git/refs', {
+        owner,
+        repo,
+        ref: `refs/heads/${headBranch}`,
+        sha: baseSha,
+      });
+      console.log(`Created branch ${headBranch} from ${baseBranch}`);
+    }
+
+    // Apply each file change
+    for (const change of changes) {
+      try {
+        // Check if file exists to get its SHA (needed for update)
+        const { data: existingFile } = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+          owner,
+          repo,
+          path: change.file,
+          ref: headBranch,
+        });
+
+        // Update existing file - handle both single file and directory array responses
+        const fileSha = Array.isArray(existingFile)
+          ? existingFile.find(f => f.path === change.file)?.sha
+          : existingFile.sha;
+
+        if (!fileSha) {
+          throw new Error(`Could not find SHA for ${change.file}`);
+        }
+
+        await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+          owner,
+          repo,
+          path: change.file,
+          message: `Update ${change.file} with suggested changes`,
+          content: Buffer.from(change.content).toString('base64'),
+          sha: fileSha,
+          branch: headBranch,
+        });
+
+        console.log(`Updated file ${change.file}`);
+      } catch (error) {
+        // File doesn't exist, create it
+        await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
+          owner,
+          repo,
+          path: change.file,
+          message: `Create ${change.file} with suggested changes`,
+          content: Buffer.from(change.content).toString('base64'),
+          branch: headBranch,
+        });
+
+        console.log(`Created file ${change.file}`);
+      }
+    }
+
+    // Create a pull request
+    const { data: pullRequest } = await octokit.request('POST /repos/{owner}/{repo}/pulls', {
+      owner,
+      repo,
+      title,
+      body,
+      head: headBranch,
+      base: baseBranch,
+    });
+
+    console.log(`Created PR #${pullRequest.number}: ${title}`);
+    return pullRequest;
+  } catch (error) {
+    console.error('Error creating PR from suggestions:', error);
+    throw error;
+  }
+};
