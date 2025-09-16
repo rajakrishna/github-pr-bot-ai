@@ -1,7 +1,7 @@
 import { google } from '@ai-sdk/google';
 import { generateText, streamText } from 'ai';
 
-const googleAI = google('gemini-2.0-pro-exp-02-05');
+const googleAI = google('gemini-2.5-flash');
 
 export async function generatePRComment(
   owner: string,
