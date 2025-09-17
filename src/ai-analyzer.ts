@@ -50,20 +50,19 @@ export async function generatePRComment(
       - Explain the problem in one sentence
       - Provide a solution in a code block
 
-      Format in Markdown with code blocks. 
       Include \`/apply-suggestions\` at the end  if there are any issues found and need to be applied. 
-      If there are no issues found, do not include it.
+      If there are no issues found, do not include it. Format the comment as markdown.
       `;
 
-    // Generate the comment using Google AI
     const { text } = await generateText({
       model: googleAI,
       prompt: prompt,
       temperature: 0.7,
-      maxTokens: 4000, // Ensure we have enough tokens for a thorough review
+      maxTokens: 4000,
     });
 
     const result = text;
+    console.log('LLM response', JSON.stringify(result));
     return result || 'Hello! I reviewed your PR but encountered an issue generating detailed feedback.';
   } catch (error) {
     console.error('Error generating AI comment:', error);

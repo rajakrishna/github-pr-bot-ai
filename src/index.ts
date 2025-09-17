@@ -90,7 +90,7 @@ githubApp.webhooks.on('issue_comment.created', async ({ octokit, payload }) => {
 
     // Check if the comment is from our bot
     const botUsername = process.env.GITHUB_BOT_USERNAME || '';
-    if (commentAuthor === botUsername && !commentBody.includes('/apply-suggestions')) {
+    if (commentAuthor === botUsername) {
       console.log(`Comment on PR #${prNumber} is from our bot, skipping`);
       return;
     }
