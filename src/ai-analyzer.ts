@@ -51,7 +51,8 @@ export async function generatePRComment(
       - Provide a solution in a code block
 
       Include \`/apply-suggestions\` at the end  if there are any issues found and need to be applied. 
-      If there are no issues found, do not include it. Format the comment as markdown.
+      If there are no issues found, do not include it. Format the comment as markdown. 
+      Dont include \`\`\` markdown at the beginning and end of the comment. 
       `;
 
     const { text } = await generateText({
