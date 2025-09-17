@@ -50,7 +50,7 @@ export async function generatePRComment(
       - Explain the problem in one sentence
       - Provide a solution in a code block
 
-      Include \`/apply-suggestions\` at the end  if there are any issues found and need to be applied. 
+      Include "Comment \`/apply-suggestions\` to apply the changes in the PR." at the end  if there are any issues found and need to be applied. 
       If there are no issues found, do not include it. Format the comment as markdown. 
       Dont include \`\`\` markdown at the beginning and end of the comment. 
       `;
