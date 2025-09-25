@@ -9,7 +9,6 @@
     "local:build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn src/index.ts",
-    "test:ai": "npm run build && node scripts/test-ai-analyzer.js",
     "docker:build": "docker build -t github-pr-bot .",
     "docker:run": "docker run -p 3000:8080 --env-file .env github-pr-bot",
     "docker:local": "npm run docker:build && npm run docker:run",

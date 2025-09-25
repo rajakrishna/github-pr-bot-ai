@@ -27,6 +27,14 @@ githubApp.webhooks.on('pull_request.opened', async ({ octokit, payload }) => {
 
     console.log(`New PR #${prNumber} opened in ${owner}/${repo}`);
 
+    const prAuthor = payload.pull_request.user.login;
+
+    const botUsername = process.env.GITHUB_BOT_USERNAME || '';
+    if (prAuthor === botUsername) {
+      console.log(`PR #${prNumber} is from our bot, skipping`);
+      return;
+    }
+
     // Get the PR files to analyze the changes
     const { data: files } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}/files', {
       owner,
