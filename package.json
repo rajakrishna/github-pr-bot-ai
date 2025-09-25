@@ -8,7 +8,7 @@
     "build": "node_modules/.bin/tsc",
     "local:build": "tsc",
     "start": "node dist/index.js",
-    "dev": "ts-node-dev --respawn src/index.ts",
+    "dev": "tsx src/index.ts",
     "docker:build": "docker build -t github-pr-bot .",
     "docker:run": "docker run -p 3000:8080 --env-file .env github-pr-bot",
     "docker:local": "npm run docker:build && npm run docker:run",
@@ -28,8 +28,7 @@
     "@types/node": "^20.10.0",
     "nodemon": "^3.0.1",
     "prettier": "^3.5.3",
-    "ts-node": "^10.9.1",
-    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.20.5",
     "typescript": "^5.8.2"
   },
   "engines": {
