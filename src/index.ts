@@ -1,7 +1,7 @@
 import express from 'express';
 import * as dotenv from 'dotenv';
-import { initializeGitHubApp, getInstallationOctokit } from './github-app.js';
-import { generatePRComment, createPRFromSuggestions } from './ai-analyzer.js';
+import { initializeGitHubApp } from './github-app.ts';
+import { generatePRComment, createPRFromSuggestions } from './ai-analyzer.ts';
 
 dotenv.config();
 const app = express();

@@ -2,7 +2,7 @@ import { Octokit, App } from 'octokit';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export const initializeGitHubApp = () => {
+export const initializeGitHubApp = (): App => {
   try {
     let privateKey: string;
 
@@ -39,7 +39,7 @@ export const initializeGitHubApp = () => {
   }
 };
 
-export const getInstallationOctokit = async (appOctokit: App, owner: string, repo: string) => {
+export const getInstallationOctokit = async (appOctokit: App, owner: string, repo: string): Promise<Octokit> => {
   try {
     const installation = await appOctokit.octokit.request('GET /repos/{owner}/{repo}/installation', {
       owner,

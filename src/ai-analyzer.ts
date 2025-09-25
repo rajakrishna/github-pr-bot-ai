@@ -46,7 +46,7 @@ export async function generatePRComment(
       2. Highlights performance issues
 
       For each issue:
-      - Specify file and line number
+      - Specify file
       - Explain the problem in one sentence
       - Provide a solution in a code block
 
